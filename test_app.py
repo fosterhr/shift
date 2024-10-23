@@ -1,17 +1,22 @@
 import pytest
-import json
-from flask import Flask
 from app import app, db, User
 import bcrypt
+import tempfile
 
 @pytest.fixture
 def client():
+    # Create a temporary file to use for the SQLite database
+    db_fd, db_path = tempfile.mkstemp()
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///:memory:"
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
+    
     with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.drop_all()
+        db.create_all()  # Create the database tables
+        yield app.test_client()  # This is the test client
+        db.drop_all()  # Clean up after tests
+    # Close and remove the temporary database file
+    os.close(db_fd)
+    os.remove(db_path)
 
 def test_register(client):
     response = client.post('/register', data={
