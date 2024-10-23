@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+    <head>
+        <title>Register</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link href="/static/css/styles.css" rel="stylesheet"/>
+        <script src="/static/js/scripts.js"></script>
+    </head>
+
+    <body>
+        <!-- Form to accept a email, password, and password confirmation to register. -->
+        <form action="/register", method="POST" onsubmit="return encryptPassword()">
+            <input type="email" name="email" placeholder="Email"/>
+            <input type="password" name="password" placeholder="Password"/>
+            <input type="password" name="confirm_password" placeholder="Confirm Password"/>
+            <button type="submit">Submit</button>
+        </form>
+
+        <script src="/static/js/lib/bcrypt.min.js"></script>
+        <script>
+            async function encryptPassword() {
+                const passwordField = document.getElementById("password");
+                const password = passwordField.value;
+                // Generate a salt and hash the password
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
+                // Replace the original password value with the hashed password
+                passwordField.value = hashedPassword;
+
+                return true; // Allow the form to be submitted
+            }
+        </script>
+        
+        <!-- Text to display if the template is returned with an error message. -->
+        <p style="color: red;">{{ error_message }}</p>
+        <!-- Link to the login form. -->
+        <p><a href="/login">Already have an account?</a></p>
+    </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+    <head>
+        <title>My Account</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link href="/static/css/styles.css" rel="stylesheet"/>
+        <script src="/static/js/scripts.js"></script>
+    </head>
+
+    <body>
+        <!-- ACCOUNT SECTION -->
+        <strong>Account Information:</strong>
+        <p>
+            ID: {{ user.id }}<br/>
+            Email: {{ user.email }}<br/>
+            Created: <span id="user-created-at"></span><br/>
+            Last Login: <span id="user-last-login"></span><br/>
+        </p>
+
+        <script>
+            // Adjust the timestamps of the "user-created-at" and "user-last-login" elements.
+            document.getElementById("user-created-at").innerHTML = 
+                "{{ user.created_at }}" != "None" ? convertTimestampToLocalTime("{{ user.created_at }}") : "None";
+            document.getElementById("user-last-login").innerHTML = 
+                "{{ user.last_login }}" != "None" ? convertTimestampToLocalTime("{{ user.last_login }}") : "None";
+        </script>
+
+        <!-- WEIGHT SECTION -->
+        <section>
+            <strong>Weight History:</strong>
+            <p>
+                <form action="/api/weight", method="POST">
+                    <input name="weight" placeholder="Weight"/>
+                    <input name="satisfaction" placeholder="Satisfaction (1-10)"/>
+                    <button type="submit">Submit</button>
+                </form>
+                <br/>
+                Total Entries: {{ weight_data.history|length }}<br/>
+                {% if weight_data.history|length > 0 %}
+                    <!-- Most recent entry.-->
+                    Last Entry: <span id="weight-last-entry"></span><br/>
+                    <script>
+                        // Adjust the timestamps of the "weight-last-entry" and "user-last-login" elements.
+                        document.getElementById("weight-last-entry").innerHTML = 
+                            "{{ weight_data.history[0].created_at }}" != "None" ? convertTimestampToLocalTime("{{ weight_data.history[0].created_at }}") : "None";
+                    </script>
+
+                    <!-- All weight entries. -->
+                    All Entries:
+                    <ul>
+                        {% for w in weight_data.history %}
+                            <li>
+                                {{ w.weight }} lbs on <span id="{{ w.id }}_created-at"></span>
+                            </li>
+
+                            <script>
+                                // Adjust the timestamps of each weight entry elements.
+                                document.getElementById("{{ w.id }}_created-at").innerHTML = 
+                                    "{{ w.created_at }}" != "None" ? convertTimestampToLocalTime("{{ w.created_at }}") : "None";
+                            </script>
+                        {% endfor %}
+                    </ul>
+
+                    Lowest Weight: {{ weight_data.lowest_weight.weight }} on <span id="weight-lowest-weight"></span><br/>
+                    Highest Weight: {{ weight_data.highest_weight.weight }} on <span id="weight-highest-weight"></span><br/>
+                    <script>
+                        // Adjust the timestamps of the "weight-lowest-weight" and "weight-highest-weight" elements.
+                        document.getElementById("weight-lowest-weight").innerHTML = 
+                            "{{ weight_data.lowest_weight.created_at }}" != "None" ? convertTimestampToLocalTime("{{ weight_data.lowest_weight.created_at }}") : "None";
+                        document.getElementById("weight-highest-weight").innerHTML = 
+                            "{{ weight_data.highest_weight.created_at }}" != "None" ? convertTimestampToLocalTime("{{ weight_data.highest_weight.created_at }}") : "None";
+                    </script>
+
+                    Average Satisfaction: {{ weight_data.average_satisfaction }}
+                {% endif %}
+            </p>
+        </section>
+    </body>
+</html>
