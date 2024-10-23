@@ -67,12 +67,25 @@ def home():
 def account():
     user = flask_login.current_user
     weight_history = sorted(Weight.query.filter_by(user_id=user.id).all(), key=lambda w: w.created_at, reverse=True)
+    # Initialize variables
+    lowest_weight = None
+    highest_weight = None
+    avg_satisfaction = 0
+
+    # Check if weight_history is not empty before calculations
+    if weight_history:
+        lowest_weight = min(weight_history, [w.weight for w in weight_history])
+        highest_weight = max(weight_history, [w.weight for w in weight_history])
+        avg_satisfaction = statistics.mean([w.satisfaction for w in weight_history])
+
+    
     weight_data = {
         "history": weight_history,
-        "lowest_weight": min(weight_history, key=lambda w: w.weight),
-        "highest_weight": max(weight_history, key=lambda w: w.weight),
-        "average_satisfaction": statistics.mean([w.satisfaction for w in weight_history])
+        "lowest_weight": lowest_weight,
+        "highest_weight": highest_weight,
+        "average_satisfaction": avg_satisfaction
     }
+    
     return render_template("account.html", user=user, weight_data=weight_data)
 
 @app.route("/login", methods=["GET", "POST"])
