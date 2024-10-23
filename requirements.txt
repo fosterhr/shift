@@ -1,8 +1,4 @@
 flask
 flask_login
 flask_sqlalchemy
-sqlite3
-datetime
 bcrypt
-statistics
-sqlite3
